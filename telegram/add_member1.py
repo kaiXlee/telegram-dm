@@ -1,9 +1,11 @@
 import logging
 from telethon import sync, TelegramClient, events
-from telethon.tl.types import InputPeerChannel, PeerUser
+from telethon.tl.types import InputPeerChannel, PeerUser, DocumentAttributeVideo
 from telethon.tl.types import InputPeerUser
 from telethon.tl.functions.channels import InviteToChannelRequest
 from telethon.errors.rpcerrorlist import PeerFloodError, UserPrivacyRestrictedError, FloodWaitError
+from hachoir.metadata import extractMetadata
+from hachoir.parser import createParser
 import time
 import traceback
 import datetime
@@ -11,7 +13,32 @@ import os
 import json
 
 
+
+
 class MemberManager:
+    myMsg = '''🤡ClownX🤡 is a project that aims to develop a WEB3 decentralized community brand with fashion. 
+
+They aim to create a “real community brand” within the NFT world. They plan to attract like minded people who appreciate their art but stay for the community. A community with culture, shared value, and dope profile picture. 
+
+⭐️HIgh Quality Art
+🏁Large and detailed Roadmap in coming
+🎁Free NFTs in contests
+
+🎉🎉CLOWNLIST GIVEAWAY IS OPEN RIGHT NOW + FREE MINT SPOTS🎉🎉
+
+To Enter: 
+Go to their newest post on twitter do the following:
+
+https://twitter.com/clownxnft/status/1526970874729009152?s=21&t=NWa2VAyVIfQ1GW4IlnXytw
+
+1. Follow @ClownXnft
+2. Like +RT + Tag Friends 
+3. There is a code hidden in the video above which consist of several alphabets and numbers. Find out the exact code with the exact letter case and order then dm the official twitter account the answer to earn your FREE MINT SPOT.  1st and 50th will receive a free mint spot (We will announce once the free mint spots are taken, and we will provide proof in the thread)
+
+Giveaway Ends in 72 hours!!!
+
+There will be more giveaway in the future'''
+
     def __init__(self):
         with open('config.json', 'r', encoding='utf-8') as f:
             self.config = json.loads(f.read())
@@ -56,13 +83,34 @@ class MemberManager:
         group_source_id = self.config['group_source']
         client = self.clients[0]
         phone = client['phone']
-        users_to_add_file = self.root_path + '/data/user/' + phone + "_" + str(group_source_id) + '.json'
+        users_to_add_file = self.root_path + '\\data\\user\\' + phone + "_" + str(group_source_id) + '.json'
         with open(users_to_add_file, encoding='utf-8') as f:
             client['target_users'] = json.loads(f.read())
+        send_count = 0
+        video_file = 'C:/Projects/telegram-dm/telegram/data/items/promo_vid.mp4'
+        metadata = extractMetadata(createParser(video_file))
         for user in client['target_users']:
             try:
+                send_count += 1
+                # count_add if added 35 user
+                if send_count % 35 == 0:
+                    print('sleep 15 minute')
+                    time.sleep(15 * 60)
                 entity = client['client'].get_entity(user['username'])
-                client['client'].send_message(entity=entity, message="Hi! Please disregard this messsage. Testing telegram bot :)")
+                # client['client'].send_message(entity=entity, message=self.myMsg)
+                # time.sleep(0.5)
+                # client['client'].send_file(entity=entity, file='C:/Projects/telegram-dm/telegram/data/items/picture.jpg')
+                # time.sleep(0.5)
+                # client['client'].send_file(entity=entity, file=video_file, attributes=(
+                #                   DocumentAttributeVideo(
+                #                       (0, metadata.get('duration').seconds)[metadata.has('duration')],
+                #                       (0, metadata.get('width'))[metadata.has('width')],
+                #                       (0, metadata.get('height'))[metadata.has('height')]
+                #                   )))
+                client['client'].send_file(entity=entity, file=video_file, attributes=(DocumentAttributeVideo(0, 0, 0),))
+                time.sleep(0.5)
+                print(f"messaged sent to: {user['username']}")
+
             except Exception as e:
                 print(f"Error sending message to {user['user_id']}: {e}")
 

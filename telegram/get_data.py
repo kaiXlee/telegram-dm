@@ -37,6 +37,8 @@ def get_data_group(client, phone):
         hash=0
     ))
     chats.extend(query.chats)
+
+    # get only chats that are valid and add to groups
     for chat in chats:
         try:
             if chat.megagroup is not None and chat.access_hash is not None:
@@ -65,24 +67,23 @@ def get_data_group(client, phone):
 
 def get_data_user(client, group):
     group_id = str(group.id)
-    print(group_id)
+    print('group_id: ' + group_id)
 
     while_condition = True
     my_filter = ChannelParticipantsSearch('')
     offset = 0
     all_participants = []
-    
+    count = 0
     while while_condition:
-        participants = client(GetParticipantsRequest(channel=group,  offset= offset, filter = my_filter, limit=200, hash=0))
-        
+        participants = client(GetParticipantsRequest(channel=group, offset=offset, filter=my_filter, limit=200, hash=0))
+
         all_participants.extend(participants.users)
         offset += len(participants.users)
-        
-        print(len(participants.users))
-        
-        if len(participants.users) < 1 :
+        print(f'Number of new participants added (round {++count}): {len(participants.users)}')
+
+        if len(participants.users) < 1:
             while_condition = False
-            
+    print(f"------- Total participants in group: {len(all_participants)}")
     results = []
     today = datetime.now()
     last_week = today + timedelta(days=-7)

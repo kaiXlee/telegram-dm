@@ -170,8 +170,8 @@ while i < total_user:
     	filter_clients.remove(current_client)
     	
     	continue
-    except:
-        print("Error other")
+    except Exception as e:
+        print("Error other" + e)
     # break
 
     i += 1
